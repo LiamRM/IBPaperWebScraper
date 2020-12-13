@@ -21,6 +21,11 @@ examSessionLinks = []
 availablePapers = []
 paperLinks = []
 
+# CSV Setup
+csv_file = open('cms_scrape.csv', 'w')
+csv_writer = csv.writer(csv_file)
+csv_writer.writerow(['Paper title', 'year', 'PDF Link']) #Writing a list of values
+
 # Compiling list of subject links
 for tabledata in soup.find_all('td', class_='indexcolname'):
     urlList.append(tabledata.a.text) 
@@ -67,13 +72,11 @@ for paper in availablePapers:
     else:
         # Create link to paper
         paperUrl = f'{examSessionUrl}{paper}'
+        csv_writer.writerow([paperUrl])             # writing row to csv
         paperLinks.append(paperUrl)
 print(paperLinks)
 
-# CSV Setup
-csv_file = open('cms_scrape.csv', 'w')
-csv_writer = csv.writer(csv_file)
-csv_writer.writerow(['Paper title', 'year', 'PDF Link']) #Writing a list of values
+csv_file.close()
 
 #Other tutorial stuff
 
