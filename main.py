@@ -8,6 +8,9 @@ endYear = '2019'
 paper1 = True
 paper2 = True
 paper3 = True
+tz0 = True
+tz1 = True
+tz2 = True
 withMarkscheme = True       #please type 'True' or 'False'
 hl = True                   #if HL = 'False', then SL papers will be downloaded
 
@@ -22,7 +25,7 @@ availablePapers = []
 paperLinks = []
 
 # CSV Setup
-csv_file = open('cms_scrape.csv', 'w')
+csv_file = open('cms_scrape.csv', 'w', newline='')
 csv_writer = csv.writer(csv_file)
 csv_writer.writerow(['Paper title', 'year', 'PDF Link']) #Writing a list of values
 
@@ -33,7 +36,7 @@ for tabledata in soup.find_all('td', class_='indexcolname'):
 print("Url List:", urlList)
 print()
 # Creating links to the subjects (methods, studies, further, etc...)
-subjUrl = f'{url}{urlList[3]}'      
+subjUrl = f'{url}{urlList[4]}'      
 print(subjUrl)
 subjSoup = BeautifulSoup(requests.get(subjUrl).text, 'lxml')
 
@@ -43,7 +46,7 @@ for tabledata in subjSoup.find_all('td', class_='indexcolname'):
 print(availableYears)
 
 # Looping through years to check for matching starting year
-for year in availableYears:
+for i, year in enumerate(availableYears):
     print(year[:4])
     if year[:4] == startYear:               #gets the first 4 characters of string, inclusive
         print('Matching year! ', startYear)
@@ -55,6 +58,7 @@ if validStartYear == True:
     for year in availableYears:
         examSessionUrl = f'{subjUrl}{year}'
         examSessionLinks.append(examSessionUrl)
+        currentYear = year
 
 print(examSessionUrl)
 # Using latest examSessionUrl as a test
@@ -72,9 +76,10 @@ for paper in availablePapers:
     else:
         # Create link to paper
         paperUrl = f'{examSessionUrl}{paper}'
-        csv_writer.writerow([paperUrl])             # writing row to csv
+        csv_writer.writerow([paper, currentYear, paperUrl])             # writing row to csv
         paperLinks.append(paperUrl)
-print(paperLinks)
+
+#print(paperLinks)
 
 csv_file.close()
 
