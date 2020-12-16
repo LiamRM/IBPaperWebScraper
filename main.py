@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import csv
 
 # Setting up the search variables
+chosenSubj = 4                  # index of the list of subjects. 1 = Further Math HL, 2 = Further Math SL, 3 = Math Methods SL...
 paper1 = True
 paper2 = True
 paper3 = True
@@ -16,7 +17,7 @@ hl = True                   #if HL = 'False', then SL papers will be downloaded
 url = 'https://www.ibdocuments.com/IB%20PAST%20PAPERS%20-%20SUBJECT/Group%205%20-%20Mathematics/'
 source = requests.get(url).text
 soup = BeautifulSoup(source, 'lxml')
-urlList = []
+subjectList = []
 availableYears = []
 availablePapers = []
 availablePaperYears = []            # associating a year with each available paper
@@ -29,19 +30,21 @@ csv_writer.writerow(['Paper title', 'year', 'PDF Link']) #Writing a list of valu
 
 # Compiling list of subject links
 for td in soup.find_all('td', class_='indexcolname'):
-    urlList.append(td.a.text) 
+    subjectName = td.a.text
+    subjectList.append(subjectName) 
 
-print("Url List:", urlList)
 print()
-# Creating links to the subjects (methods, studies, further, etc...)
-subjUrl = f'{url}{urlList[4]}'      
-print(subjUrl)
+print("Subject List:", subjectList)
+print("Chosen Subject:", subjectList[chosenSubj])
+
+subjUrl = f'{url}{subjectList[chosenSubj]}'          # Creating links to chosen subject (methods, studies, further, etc...)
 subjSoup = BeautifulSoup(requests.get(subjUrl).text, 'lxml')
 
 print()
 for td in subjSoup.find_all('td', class_='indexcolname'):
-    availableYears.append(td.a.text)
-print(availableYears)
+    examSessionName = td.a.text
+    availableYears.append(examSessionName)
+#print(availableYears)
 
 # Generate new links to yearly exam session
 for year in availableYears:
@@ -50,11 +53,13 @@ for year in availableYears:
     # Using latest examSessionUrl as a test
     examSessionSoup = BeautifulSoup(requests.get(examSessionUrl).text, 'lxml')
     for td in examSessionSoup.find_all('td', class_='indexcolname'):
-        availablePapers.append(td.a.text)
+        paperName = td.a.text
+        availablePapers.append(paperName)
+
         availablePaperYears.append(year)
         examSessionLinks.append(examSessionUrl)
 
-    print("Generating links for ", year, "...")
+    print("Generating links for", year, "...")
 
 # Taking relevant papers from available into paperLinks Lists
 for i, paper in enumerate(availablePapers):
@@ -69,23 +74,3 @@ for i, paper in enumerate(availablePapers):
 
 print("Done!")
 csv_file.close()
-
-#Other tutorial stuff
-
-#with open('simple.html') as html_file:
-#    soup = BeautifulSoup(html_file, 'lxml')
-
-# print(soup.prettify())
-#match = soup.find('div') #Finds the first div in the html file
-
-# Loops through all the articles in the html file
-#for article in soup.find('div', class_='article'):
-    #print(article)
-
-    #headline = article.h2.a.text 
-    #print(headline)
-
-    #summary = article.p.text 
-    #print(summary)
-
-    #print()
