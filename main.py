@@ -3,8 +3,6 @@ from bs4 import BeautifulSoup
 import csv
 
 # Setting up the search variables
-startYear = '2000'
-endYear = '2019'
 paper1 = True
 paper2 = True
 paper3 = True
@@ -20,9 +18,9 @@ source = requests.get(url).text
 soup = BeautifulSoup(source, 'lxml')
 urlList = []
 availableYears = []
-examSessionLinks = []
 availablePapers = []
-paperLinks = []
+availablePaperYears = []            # associating a year with each available paper
+examSessionLinks = []               # associating an exam session URL with each available paper
 
 # CSV Setup
 csv_file = open('cms_scrape.csv', 'w', newline='')
@@ -30,8 +28,8 @@ csv_writer = csv.writer(csv_file)
 csv_writer.writerow(['Paper title', 'year', 'PDF Link']) #Writing a list of values
 
 # Compiling list of subject links
-for tabledata in soup.find_all('td', class_='indexcolname'):
-    urlList.append(tabledata.a.text) 
+for td in soup.find_all('td', class_='indexcolname'):
+    urlList.append(td.a.text) 
 
 print("Url List:", urlList)
 print()
@@ -41,46 +39,35 @@ print(subjUrl)
 subjSoup = BeautifulSoup(requests.get(subjUrl).text, 'lxml')
 
 print()
-for tabledata in subjSoup.find_all('td', class_='indexcolname'):
-    availableYears.append(tabledata.a.text)
+for td in subjSoup.find_all('td', class_='indexcolname'):
+    availableYears.append(td.a.text)
 print(availableYears)
 
-# Looping through years to check for matching starting year
-for i, year in enumerate(availableYears):
-    print(year[:4])
-    if year[:4] == startYear:               #gets the first 4 characters of string, inclusive
-        print('Matching year! ', startYear)
-        validStartYear = True
-        # need a way to get the index
+# Generate new links to yearly exam session
+for year in availableYears:
+    examSessionUrl = f'{subjUrl}{year}'
 
-# If match, generate new links
-if validStartYear == True:
-    for year in availableYears:
-        examSessionUrl = f'{subjUrl}{year}'
+    # Using latest examSessionUrl as a test
+    examSessionSoup = BeautifulSoup(requests.get(examSessionUrl).text, 'lxml')
+    for td in examSessionSoup.find_all('td', class_='indexcolname'):
+        availablePapers.append(td.a.text)
+        availablePaperYears.append(year)
         examSessionLinks.append(examSessionUrl)
-        currentYear = year
 
-print(examSessionUrl)
-# Using latest examSessionUrl as a test
-examSessionSoup = BeautifulSoup(requests.get(examSessionUrl).text, 'lxml')
-for tabledata in examSessionSoup.find_all('td', class_='indexcolname'):
-    availablePapers.append(tabledata.a.text)
-print(availablePapers)
+    print("Generating links for ", year, "...")
 
 # Taking relevant papers from available into paperLinks Lists
-for paper in availablePapers:
-    if paper.__contains__('French'):
-        pass
-    elif paper.__contains__('Spanish'):
+for i, paper in enumerate(availablePapers):
+    if paper.__contains__('French') or paper.__contains__('Spanish') or paper.__contains__('Parent'):
         pass
     else:
-        # Create link to paper
+        # Create link to paper (getting English papers only)
+        currentYear = availablePaperYears[i]
+        examSessionUrl = examSessionLinks[i]
         paperUrl = f'{examSessionUrl}{paper}'
         csv_writer.writerow([paper, currentYear, paperUrl])             # writing row to csv
-        paperLinks.append(paperUrl)
 
-#print(paperLinks)
-
+print("Done!")
 csv_file.close()
 
 #Other tutorial stuff
