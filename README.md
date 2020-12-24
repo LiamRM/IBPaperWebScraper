@@ -14,8 +14,8 @@ The user specifies the subject level (Higher Level or Standard Level), and the p
     * These are the Python download links for [Windows](https://www.python.org/downloads/windows/) and for [Mac](https://www.python.org/downloads/mac-osx/)
     * Git comes on most Macs and Linux machines, but if it is not installed, this [installation guide](https://github.com/git-guides/install-git#:~:text=To%20install%20Git%2C%20navigate%20to,installation%20by%20typing%3A%20git%20version%20.) may help.
 2. Clone/download the git repo into a folder on your computer.
-3. Open setup.py and enter the respective search parameters (what subject, what IB papers desired)
-4. In terminal, access the program folder and type "python main.py"
+3. Open main.py and enter the respective search parameters (what subject, what IB papers desired)
+4. In terminal, access the program folder and type "python3 main.py"
 5. The program should run, displaying its progress collecting links for each year.
 6. When the 'Done!' message appears, a CSV file titled 'cms_scrape.csv' should be created in the folder. Open it in Excel or another CSV reader and copy the links desired. 
 7. Paste these links into OpenList, a free Google Chrome extension, and click 'Open' to open all the links.
