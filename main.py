@@ -35,7 +35,9 @@ def main():
         subjectList.append(subjectName) 
 
     print()
-    print("Subject List:", subjectList)
+    print("SUBJECT LIST:")
+    for i, subject in enumerate(subjectList):
+        print(i, ":", subject)
     print("Chosen Subject:", subjectList[chosenSubj])
 
     subjUrl = f'{url}{subjectList[chosenSubj]}'          # Creating links to chosen subject (methods, studies, further, etc...)
